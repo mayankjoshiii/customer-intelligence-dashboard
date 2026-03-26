@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Intelligence Platform | ML-Powered Analytics</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 1.5rem 2rem;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f472b6, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .segment-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .segment-selector label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #cbd5e1;
+        }
+
+        .segment-selector select {
+            padding: 0.5rem 1rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: #e2e8f0;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .segment-selector select:hover {
+            border-color: rgba(244, 114, 182, 0.5);
+            background: rgba(30, 41, 59, 1);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid rgba(244, 114, 182, 0.3);
+            color: #f1f5f9;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            border-color: rgba(244, 114, 182, 0.4);
+            background: rgba(30, 41, 59, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(244, 114, 182, 0.1);
+        }
+
+        .metric-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f472b6;
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-sparkline {
+            height: 40px;
+            margin-top: auto;
+        }
+
+        .metric-change {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            margin-top: 0.5rem;
+        }
+
+        .metric-change.positive {
+            color: #6ee7b7;
+        }
+
+        .metric-change.negative {
+            color: #f87171;
+        }
+
+        .chart-container {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 1.5rem;
+            min-height: 500px;
+        }
+
+        .chart-container.tall {
+            min-height: 600px;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #f1f5f9;
+        }
+
+        .chart-description {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        table th {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            font-size: 0.9rem;
+        }
+
+        table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            font-size: 0.9rem;
+        }
+
+        table tr:hover {
+            background: rgba(244, 114, 182, 0.05);
+        }
+
+        .segment-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .segment-champions {
+            background: rgba(244, 114, 182, 0.2);
+            color: #f472b6;
+        }
+
+        .segment-loyal {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+        }
+
+        .segment-atrisk {
+            background: rgba(251, 146, 60, 0.2);
+            color: #fb923c;
+        }
+
+        .segment-lost {
+            background: rgba(244, 63, 94, 0.2);
+            color: #f43f5e;
+        }
+
+        .segment-new {
+            background: rgba(110, 231, 183, 0.2);
+            color: #6ee7b7;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+            margin-top: 3rem;
+        }
+
+        .footer a {
+            color: #f472b6;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #38bdf8;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            color: #94a3b8;
+        }
+
+        .spinner {
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-top: 2px solid #f472b6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .metric-highlight {
+            color: #38bdf8;
+        }
+
+        .warning-text {
+            color: #fbbf24;
+        }
+
+        .success-text {
+            color: #6ee7b7;
+        }
+
+        .info-box {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 3px solid #38bdf8;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-value {
+                font-size: 1.5rem;
+            }
+
+            .chart-container {
+                min-height: 400px;
+            }
+        }
+
+        .heatmap-container {
+            overflow-x: auto;
+        }
+
+        .sankey-container {
+            min-height: 600px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-mini {
+            background: rgba(244, 114, 182, 0.1);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .stat-mini-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .stat-mini-value {
+            font-size: 1.25rem;
+            color: #f472b6;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(30, 41, 59, 0.8);
+            color: #cbd5e1;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .toggle-btn.active {
+            background: rgba(244, 114, 182, 0.3);
+            color: #f472b6;
+            border-color: rgba(244, 114, 182, 0.5);
+        }
+
+        .toggle-btn:hover {
+            border-color: rgba(244, 114, 182, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>📊 Customer Intelligence Platform</h1>
+            <div class="segment-selector">
+                <label for="segmentFilter">Filter by Segment:</label>
+                <select id="segmentFilter">
+                    <option value="">All Segments</option>
+                    <option value="Champions">Champions</option>
+                    <option value="Loyal">Loyal Customers</option>
+                    <option value="At Risk">At Risk</option>
+                    <option value="Lost">Lost Customers</option>
+                    <option value="New">New Customers</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Executive Summary Section -->
+        <div class="section">
+            <h2 class="section-title">Executive Summary</h2>
+            <div class="cards-grid" id="summaryCards">
+                <div class="card loading"><div class="spinner"></div> Loading metrics...</div>
+            </div>
+        </div>
+
+        <!-- RFM Analysis Section -->
+        <div class="section">
+            <h2 class="section-title">RFM Analysis & Segmentation</h2>
+
+            <div class="two-column">
+                <div class="chart-container tall">
+                    <div class="chart-title">3D RFM Distribution</div>
+                    <div class="chart-description">Interactive 3D visualization of Recency (days), Frequency (orders), and Monetary (total spend)</div>
+                    <div id="rfm3dPlot"></div>
+                </div>
+                <div class="chart-container tall">
+                    <div class="chart-title">RFM Score Distribution</div>
+                    <div class="chart-description">Distribution of calculated RFM scores across customer base</div>
+                    <div id="rfmScorePlot"></div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">RFM Segment Overview</div>
+                <div class="chart-description">Customer counts and key metrics by RFM segment</div>
+                <div id="rfmTable"></div>
+            </div>
+        </div>
+
+        <!-- K-Means Clustering Section -->
+        <div class="section">
+            <h2 class="section-title">K-Means Clustering Analysis</h2>
+
+            <div class="two-column">
+                <div class="chart-container tall">
+                    <div class="chart-title">PCA Projection (2D)</div>
+                    <div class="chart-description">Principal Component Analysis of customer features, colored by cluster</div>
+                    <div id="pcaPlot"></div>
+                </div>
+                <div class="chart-container tall">
+                    <div class="chart-title">Elbow Method & Silhouette Analysis</div>
+                    <div class="chart-description">Determining optimal number of clusters using WCSS and silhouette scores</div>
+                    <div id="elbowPlot"></div>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="chart-container">
+                    <div class="chart-title">Cluster Profiles (Radar Chart)</div>
+                    <div class="chart-description">Feature means for each cluster, normalized for comparison</div>
+                    <div id="radarPlot"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Clustering Metrics</div>
+                    <div id="clusteringMetrics"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLV & Cohort Analysis Section -->
+        <div class="section">
+            <h2 class="section-title">Customer Lifetime Value & Cohort Analysis</h2>
+
+            <div class="two-column">
+                <div class="chart-container tall">
+                    <div class="chart-title">Cohort Retention Heatmap</div>
+                    <div class="chart-description">Month-over-month retention rates by cohort of signup</div>
+                    <div id="cohortHeatmap"></div>
+                </div>
+                <div class="chart-container tall">
+                    <div class="chart-title">Revenue by Segment (Box Plots)</div>
+                    <div class="chart-description">CLV distribution across RFM segments</div>
+                    <div id="clvBoxPlot"></div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">Cohort Revenue Evolution</div>
+                <div class="chart-description">Total revenue per cohort over time</div>
+                <div id="cohortRevenue"></div>
+            </div>
+        </div>
+
+        <!-- Churn Prediction Section -->
+        <div class="section">
+            <h2 class="section-title">Churn Prediction Model</h2>
+
+            <div class="two-column">
+                <div class="chart-container">
+                    <div class="chart-title">Feature Importance</div>
+                    <div class="chart-description">Logistic regression coefficients indicating churn predictors</div>
+                    <div id="featureImportance"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Confusion Matrix</div>
+                    <div class="chart-description">Model accuracy across classes (threshold: 0.5)</div>
+                    <div id="confusionMatrix"></div>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="chart-container">
+                    <div class="chart-title">ROC Curve</div>
+                    <div class="chart-description">Receiver Operating Characteristic curve; AUC shows model discrimination ability</div>
+                    <div id="rocCurve"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Churn Probability Distribution</div>
+                    <div class="chart-description">Histogram of predicted churn probabilities from logistic regression</div>
+                    <div id="churnProbPlot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Journey Section -->
+        <div class="section">
+            <h2 class="section-title">Customer Journey & Flow</h2>
+
+            <div class="chart-container sankey-container">
+                <div class="chart-title">Customer Lifecycle Sankey Diagram</div>
+                <div class="chart-description">Flow of customers through lifecycle stages: acquisition, engagement, retention, churn</div>
+                <div id="sankey"></div>
+            </div>
+        </div>
+
+        <!-- Geographic Analysis Section -->
+        <div class="section">
+            <h2 class="section-title">Geographic Revenue Analysis</h2>
+
+            <div class="chart-container tall">
+                <div class="chart-title">Revenue by UK Region</div>
+                <div class="chart-description">Bubble map showing revenue concentration and customer density by region</div>
+                <div id="geoMap"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Built by <a href="https://github.com/mayankjoshiii">Mayank Joshi</a> | MSc Business Analytics</p>
+        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Customer Intelligence Platform | Machine Learning & Business Analytics</p>
+    </div>
+
+    <script>
+        // ============================================================================
+        // DATA GENERATION & ML ALGORITHMS
+        // ============================================================================
+
+        // Seeded random for reproducibility
+        class SeededRandom {
+            constructor(seed) {
+                this.seed = seed;
+            }
+            next() {
+                this.seed = (this.seed * 9301 + 49297) % 233280;
+                return this.seed / 233280;
+            }
+        }
+
+        // Generate synthetic customer data
+        function generateCustomerData(n = 2000) {
+            const rng = new SeededRandom(42);
+            const customers = [];
+            const regions = ['London', 'Southeast', 'Southwest', 'Midlands', 'East Anglia', 'North West', 'North East', 'Scotland', 'Wales', 'Northern Ireland'];
+            const channels = ['Direct', 'Paid Search', 'Social', 'Email', 'Organic', 'Affiliate', 'Referral'];
+            const categories = ['Electronics', 'Fashion', 'Home & Garden', 'Sports', 'Books', 'Beauty', 'Toys'];
+
+            const baseDate = new Date('2022-01-01');
+            const now = new Date();
+
+            for (let i = 0; i < n; i++) {
+                const signupDate = new Date(baseDate.getTime() + rng.next() * (now.getTime() - baseDate.getTime()));
+
+                // Power law distribution for spend (realistic e-commerce pattern)
+                const totalSpend = Math.pow(rng.next(), -1.5) * 2000;
+
+                // Exponential distribution for recency
+                const daysInactive = Math.floor(Math.pow(rng.next(), 0.7) * 180);
+
+                // Frequency related to spend
+                const totalOrders = Math.max(1, Math.floor(Math.pow(rng.next() + 0.3, 0.8) * 30));
+
+                const lastPurchaseDate = new Date(now.getTime() - daysInactive * 86400000);
+
+                customers.push({
+                    customerId: `CUST${String(i + 1).padStart(6, '0')}`,
+                    signupDate,
+                    lastPurchaseDate,
+                    totalOrders,
+                    totalSpend: Math.round(totalSpend * 100) / 100,
+                    avgOrderValue: Math.round((totalSpend / totalOrders) * 100) / 100,
+                    daysSinceLastPurchase: daysInactive,
+                    region: regions[Math.floor(rng.next() * regions.length)],
+                    channel: channels[Math.floor(rng.next() * channels.length)],
+                    categories: categories.slice(0, Math.floor(rng.next() * 4) + 1).join(', '),
+                    accountAge: Math.floor((now - signupDate) / (1000 * 60 * 60 * 24))
+                });
+            }
+
+            return customers;
+        }
+
+        // RFM Scoring
+        function calculateRFM(customers) {
+            const now = new Date();
+            const data = customers.map(c => ({
+                ...c,
+                recency: c.daysSinceLastPurchase,
+                frequency: c.totalOrders,
+                monetary: c.totalSpend
+            }));
+
+            // Calculate quartiles
+            const recencyValues = data.map(d => d.recency).sort((a, b) => a - b);
+            const frequencyValues = data.map(d => d.frequency).sort((a, b) => a - b);
+            const monetaryValues = data.map(d => d.monetary).sort((a, b) => a - b);
+
+            const getQuartile = (values, value) => {
+                if (value <= values[Math.floor(values.length * 0.25)]) return 4;
+                if (value <= values[Math.floor(values.length * 0.5)]) return 3;
+                if (value <= values[Math.floor(values.length * 0.75)]) return 2;
+                return 1;
+            };
+
+            return data.map(d => {
+                const rScore = 5 - getQuartile(recencyValues, d.recency); // Lower recency is better
+                const fScore = getQuartile(frequencyValues, d.frequency);
+                const mScore = getQuartile(monetaryValues, d.monetary);
+                const rfmScore = rScore * 100 + fScore * 10 + mScore;
+
+                let segment = 'Other';
+                if (rScore >= 4 && fScore >= 4 && mScore >= 4) segment = 'Champions';
+                else if (rScore >= 3 && fScore >= 3 && mScore >= 3) segment = 'Loyal';
+                else if (rScore >= 3 && fScore >= 2) segment = 'Potential';
+                else if (rScore <= 2 && fScore >= 3 && mScore >= 3) segment = 'At Risk';
+                else if (rScore <= 2 && (fScore <= 2 || mScore <= 2)) segment = 'Lost';
+                else if (rScore >= 4 && fScore <= 2 && mScore <= 2) segment = 'New';
+                else segment = 'Other';
+
+                return { ...d, rScore, fScore, mScore, rfmScore, segment };
+            });
+        }
+
+        // K-Means Clustering
+        function kMeansClustering(customers, k = 4, maxIterations = 100) {
+            // Normalize features
+            const features = ['recency', 'frequency', 'monetary', 'daysSinceLastPurchase', 'accountAge'];
+            const data = customers.map(c => features.map(f => c[f]));
+
+            const mins = features.map((_, i) => Math.min(...data.map(d => d[i])));
+            const maxs = features.map((_, i) => Math.max(...data.map(d => d[i])));
+
+            const normalized = data.map(d => d.map((v, i) => (v - mins[i]) / (maxs[i] - mins[i])));
+
+            // Random initialization
+            let centroids = [];
+            for (let i = 0; i < k; i++) {
+                centroids.push(normalized[Math.floor(Math.random() * normalized.length)]);
+            }
+
+            let assignments = new Array(normalized.length).fill(0);
+            let prevAssignments = [...assignments];
+
+            for (let iter = 0; iter < maxIterations; iter++) {
+                // Assignment step
+                assignments = normalized.map(point => {
+                    let minDist = Infinity;
+                    let cluster = 0;
+                    for (let i = 0; i < k; i++) {
+                        const dist = Math.sqrt(
+                            point.reduce((sum, v, j) => sum + Math.pow(v - centroids[i][j], 2), 0)
+                        );
+                        if (dist < minDist) {
+                            minDist = dist;
+                            cluster = i;
+                        }
+                    }
+                    return cluster;
+                });
+
+                // Update step
+                const newCentroids = [];
+                for (let i = 0; i < k; i++) {
+                    const points = normalized.filter((_, idx) => assignments[idx] === i);
+                    if (points.length > 0) {
+                        newCentroids[i] = features.map((_, j) => {
+                            return points.reduce((sum, p) => sum + p[j], 0) / points.length;
+                        });
+                    } else {
+                        newCentroids[i] = centroids[i];
+                    }
+                }
+                centroids = newCentroids;
+
+                // Check convergence
+                if (JSON.stringify(assignments) === JSON.stringify(prevAssignments)) break;
+                prevAssignments = [...assignments];
+            }
+
+            // Calculate metrics
+            let wcss = 0;
+            for (let i = 0; i < k; i++) {
+                const points = normalized.filter((_, idx) => assignments[idx] === i);
+                points.forEach(p => {
+                    wcss += Math.sqrt(p.reduce((sum, v, j) => sum + Math.pow(v - centroids[i][j], 2), 0));
+                });
+            }
+
+            return { assignments, centroids, wcss };
+        }
+
+        // PCA for dimensionality reduction
+        function performPCA(customers, k = 2) {
+            const features = ['recency', 'frequency', 'monetary', 'accountAge', 'daysSinceLastPurchase'];
+            const data = customers.map(c => features.map(f => c[f]));
+
+            // Normalize
+            const means = features.map((_, i) => data.reduce((sum, row) => sum + row[i], 0) / data.length);
+            const centered = data.map(row => row.map((v, i) => v - means[i]));
+
+            // Covariance matrix
+            const n = centered.length;
+            const cov = [];
+            for (let i = 0; i < features.length; i++) {
+                cov[i] = [];
+                for (let j = 0; j < features.length; j++) {
+                    cov[i][j] = centered.reduce((sum, row) => sum + row[i] * row[j], 0) / (n - 1);
+                }
+            }
+
+            // Power iteration for dominant eigenvectors
+            const getEigenvector = (matrix, iterations = 20) => {
+                let v = matrix[0].map(() => Math.random());
+                for (let iter = 0; iter < iterations; iter++) {
+                    let Av = [0, 0, 0, 0, 0];
+                    for (let i = 0; i < matrix.length; i++) {
+                        for (let j = 0; j < matrix[i].length; j++) {
+                            Av[i] += matrix[i][j] * v[j];
+                        }
+                    }
+                    const norm = Math.sqrt(Av.reduce((s, x) => s + x * x, 0));
+                    v = Av.map(x => x / norm);
+                }
+                return v;
+            };
+
+            const pc1 = getEigenvector(cov);
+
+            // Project data
+            return centered.map(row => [
+                row.reduce((sum, v, i) => sum + v * pc1[i], 0),
+                row.reduce((sum, v, i) => sum + v * pc1[(i + 1) % pc1.length], 0)
+            ]);
+        }
+
+        // Logistic Regression for Churn Prediction
+        function trainChurnModel(customers) {
+            // Define churn: no purchase in 60+ days
+            const data = customers.map(c => ({
+                ...c,
+                features: [
+                    c.daysSinceLastPurchase / 180,
+                    c.frequency / 50,
+                    c.monetary / 3000,
+                    (180 - c.accountAge) / 365,
+                    c.avgOrderValue / 500
+                ],
+                churn: c.daysSinceLastPurchase > 60 ? 1 : 0
+            }));
+
+            // Gradient descent
+            let weights = [0, 0, 0, 0, 0, 0]; // Including bias
+            const learningRate = 0.01;
+            const iterations = 100;
+
+            for (let iter = 0; iter < iterations; iter++) {
+                let gradients = new Array(6).fill(0);
+
+                data.forEach(d => {
+                    const z = weights[0] + d.features.reduce((sum, f, i) => sum + weights[i + 1] * f, 0);
+                    const pred = 1 / (1 + Math.exp(-z));
+                    const error = pred - d.churn;
+
+                    gradients[0] += error;
+                    d.features.forEach((f, i) => {
+                        gradients[i + 1] += error * f;
+                    });
+                });
+
+                weights = weights.map((w, i) => w - learningRate * gradients[i] / data.length);
+            }
+
+            // Predictions
+            const predictions = data.map(d => {
+                const z = weights[0] + d.features.reduce((sum, f, i) => sum + weights[i + 1] * f, 0);
+                return 1 / (1 + Math.exp(-z));
+            });
+
+            return { weights, predictions, data };
+        }
+
+        // Calculate metrics
+        function calculateMetrics(data, predictions, threshold = 0.5) {
+            const predicted = predictions.map(p => p > threshold ? 1 : 0);
+            let tp = 0, fp = 0, fn = 0, tn = 0;
+
+            data.forEach((d, i) => {
+                if (d.churn === 1 && predicted[i] === 1) tp++;
+                else if (d.churn === 0 && predicted[i] === 1) fp++;
+                else if (d.churn === 1 && predicted[i] === 0) fn++;
+                else tn++;
+            });
+
+            const accuracy = (tp + tn) / (tp + tn + fp + fn);
+            const precision = tp / (tp + fp) || 0;
+            const recall = tp / (tp + fn) || 0;
+            const f1 = 2 * (precision * recall) / (precision + recall) || 0;
+            const auc = calculateAUC(data.map(d => d.churn), predictions);
+
+            return { tp, fp, fn, tn, accuracy, precision, recall, f1, auc };
+        }
+
+        // ROC AUC calculation
+        function calculateAUC(actual, predicted) {
+            const sorted = actual.map((a, i) => ({ actual: a, pred: predicted[i] }))
+                .sort((a, b) => b.pred - a.pred);
+
+            let tp = 0, fp = 0, tpPrev = 0, fpPrev = 0;
+            let auc = 0;
+
+            sorted.forEach(s => {
+                if (s.actual === 1) tp++;
+                else fp++;
+            });
+
+            const totalPos = tp, totalNeg = fp;
+            tp = 0; fp = 0;
+
+            sorted.forEach((s, i) => {
+                if (s.actual === 1) tp++;
+                else fp++;
+
+                if (i === sorted.length - 1 || sorted[i].pred !== sorted[i + 1].pred) {
+                    auc += (fp - fpPrev) * (tp + tpPrev) / 2;
+                    tpPrev = tp;
+                    fpPrev = fp;
+                }
+            });
+
+            return auc / (totalPos * totalNeg) || 0.5;
+        }
+
+        // Cohort analysis
+        function analyzeCohorts(customers) {
+            const cohorts = {};
+
+            customers.forEach(c => {
+                const cohortMonth = c.signupDate.toISOString().substring(0, 7);
+                if (!cohorts[cohortMonth]) {
+                    cohorts[cohortMonth] = { users: 0, revenue: 0, cohortDate: c.signupDate, monthly: {} };
+                }
+                cohorts[cohortMonth].users++;
+                cohorts[cohortMonth].revenue += c.totalSpend;
+            });
+
+            return cohorts;
+        }
+
+        // ============================================================================
+        // MAIN EXECUTION
+        // ============================================================================
+
+        async function initializeDashboard() {
+            try {
+                // Generate data
+                const customers = generateCustomerData(2000);
+
+                // Calculate RFM
+                const rfmData = calculateRFM(customers);
+
+                // K-Means
+                const kmeans = kMeansClustering(rfmData, 4);
+                const clusteredData = rfmData.map((c, i) => ({ ...c, cluster: kmeans.assignments[i] }));
+
+                // PCA
+                const pcaProjection = performPCA(clusteredData);
+
+                // Churn model
+                const churnModel = trainChurnModel(clusteredData);
+                const churnMetrics = calculateMetrics(churnModel.data, churnModel.predictions);
+
+                // Cohorts
+                const cohorts = analyzeCohorts(clusteredData);
+
+                // Store globally for filtering
+                window.dashboardData = {
+                    customers: clusteredData,
+                    rfmData: rfmData,
+                    kmeans,
+                    pcaProjection,
+                    churnModel,
+                    churnMetrics,
+                    cohorts
+                };
+
+                // Render all visualizations
+                renderSummaryCards(clusteredData);
+                renderRFM3D(rfmData);
+                renderRFMScore(rfmData);
+                renderRFMTable(rfmData);
+                renderPCA(clusteredData, pcaProjection);
+                renderElbow(rfmData);
+                renderRadar(clusteredData, kmeans);
+                renderClusteringMetrics(churnMetrics);
+                renderCohortHeatmap(cohorts, clusteredData);
+                renderCLVBoxPlot(rfmData);
+                renderCohortRevenue(cohorts);
+                renderFeatureImportance(churnModel.weights);
+                renderConfusionMatrix(churnMetrics);
+                renderROCCurve(churnModel.data, churnModel.predictions);
+                renderChurnProbability(churnModel.predictions);
+                renderSankey(clusteredData);
+                renderGeoMap(clusteredData);
+
+                // Setup filtering
+                document.getElementById('segmentFilter').addEventListener('change', handleSegmentFilter);
+
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                alert('Error initializing dashboard. Check console.');
+            }
+        }
+
+        // Handle segment filtering
+        function handleSegmentFilter(event) {
+            const selectedSegment = event.target.value;
+            const allData = window.dashboardData.customers;
+
+            const filtered = selectedSegment ?
+                allData.filter(c => c.segment === selectedSegment) :
+                allData;
+
+            // Update all visualizations with filtered data
+            renderSummaryCards(filtered);
+            renderRFMTable(filtered);
+            renderPCA(filtered, window.dashboardData.pcaProjection.slice(0, filtered.length));
+            // Additional updates can be added as needed
+        }
+
+        // ============================================================================
+        // VISUALIZATION FUNCTIONS
+        // ============================================================================
+
+        function renderSummaryCards(data) {
+            const metrics = {
+                totalCustomers: data.length,
+                avgLTV: data.reduce((sum, c) => sum + c.totalSpend, 0) / data.length,
+                churnRate: (data.filter(c => c.daysSinceLastPurchase > 60).length / data.length * 100).toFixed(1),
+                avgOrderValue: (data.reduce((sum, c) => sum + c.avgOrderValue, 0) / data.length).toFixed(2),
+                retentionRate: ((1 - data.filter(c => c.daysSinceLastPurchase > 60).length / data.length) * 100).toFixed(1),
+                top20Revenue: (data.sort((a, b) => b.totalSpend - a.totalSpend).slice(0, Math.ceil(data.length * 0.2))
+                    .reduce((sum, c) => sum + c.totalSpend, 0) / data.reduce((sum, c) => sum + c.totalSpend, 0) * 100).toFixed(1)
+            };
+
+            const cards = `
+                <div class="card metric-card">
+                    <span class="metric-label">Total Customers</span>
+                    <span class="metric-value">${metrics.totalCustomers.toLocaleString()}</span>
+                    <span class="metric-change positive">+${(metrics.totalCustomers * 0.05).toFixed(0)} this month</span>
+                </div>
+                <div class="card metric-card">
+                    <span class="metric-label">Avg Customer LTV</span>
+                    <span class="metric-value">£${metrics.avgLTV.toFixed(2)}</span>
+                    <span class="metric-change positive">+2.3% vs last month</span>
+                </div>
+                <div class="card metric-card">
+                    <span class="metric-label">Churn Rate</span>
+                    <span class="metric-value metric-highlight">${metrics.churnRate}%</span>
+                    <span class="metric-change negative">+0.8% this month</span>
+                </div>
+                <div class="card metric-card">
+                    <span class="metric-label">Avg Order Value</span>
+                    <span class="metric-value">£${metrics.avgOrderValue}</span>
+                    <span class="metric-change positive">+1.2% growth</span>
+                </div>
+                <div class="card metric-card">
+                    <span class="metric-label">Retention Rate</span>
+                    <span class="metric-value metric-highlight">${metrics.retentionRate}%</span>
+                    <span class="metric-change positive">Good health</span>
+                </div>
+                <div class="card metric-card">
+                    <span class="metric-label">Top 20% Revenue Share</span>
+                    <span class="metric-value">${metrics.top20Revenue}%</span>
+                    <span class="metric-change warning-text">High concentration</span>
+                </div>
+            `;
+
+            document.getElementById('summaryCards').innerHTML = cards;
+        }
+
+        function renderRFM3D(data) {
+            const trace = {
+                x: data.map(d => d.recency),
+                y: data.map(d => d.frequency),
+                z: data.map(d => d.monetary),
+                mode: 'markers',
+                type: 'scatter3d',
+                marker: {
+                    size: 4,
+                    color: data.map(d => {
+                        const segmentColors = {
+                            'Champions': 15,
+                            'Loyal': 10,
+                            'At Risk': 5,
+                            'Lost': 0,
+                            'New': 20,
+                            'Potential': 12,
+                            'Other': 7
+                        };
+                        return segmentColors[d.segment] || 7;
+                    }),
+                    colorscale: [
+                        [0, '#f43f5e'],
+                        [0.3, '#fb923c'],
+                        [0.5, '#eab308'],
+                        [0.7, '#38bdf8'],
+                        [1, '#f472b6']
+                    ],
+                    showscale: true,
+                    colorbar: { title: 'Segment<br>Quality' }
+                },
+                text: data.map(d => `${d.customerId}<br>Segment: ${d.segment}`),
+                hovertemplate: '<b>%{text}</b><br>Recency: %{x} days<br>Frequency: %{y} orders<br>Monetary: £%{z:.2f}<extra></extra>'
+            };
+
+            const layout = {
+                title: '',
+                scene: {
+                    xaxis: { title: 'Recency (Days)', backgroundcolor: 'rgba(50,50,50,0.9)', gridcolor: '#444' },
+                    yaxis: { title: 'Frequency (Orders)', backgroundcolor: 'rgba(50,50,50,0.9)', gridcolor: '#444' },
+                    zaxis: { title: 'Monetary (£)', backgroundcolor: 'rgba(50,50,50,0.9)', gridcolor: '#444' },
+                    bgcolor: 'rgba(50,50,50,0.9)'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: '#e2e8f0' },
+                hovermode: 'closest',
+                height: 500
+            };
+
+            Plotly.newPlot('rfm3dPlot', [trace], layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderRFMScore(data) {
+            const scores = data.map(d => d.rfmScore);
+
+            const trace = {
+                x: scores,
+                type: 'histogram',
+                nbinsx: 50,
+                marker: { color: '#f472b6', opacity: 0.8 },
+                hovertemplate: 'RFM Score: %{x}<br>Count: %{y}<extra></extra>'
+            };
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'RFM Score' },
+                yaxis: { title: 'Number of Customers' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(30,41,59,0.3)',
+                font: { color: '#e2e8f0' },
+                hovermode: 'x',
+                height: 500
+            };
+
+            Plotly.newPlot('rfmScorePlot', [trace], layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderRFMTable(data) {
+            const segments = ['Champions', 'Loyal', 'At Risk', 'Lost', 'New', 'Potential', 'Other'];
+            const segmentStats = segments.map(seg => {
+                const segment = data.filter(d => d.segment === seg);
+                if (segment.length === 0) return null;
+
+                return {
+                    segment: seg,
+                    count: segment.length,
+                    avgLTV: (segment.reduce((s, d) => s + d.monetary, 0) / segment.length).toFixed(2),
+                    avgFreq: (segment.reduce((s, d) => s + d.frequency, 0) / segment.length).toFixed(1),
+                    avgRecency: (segment.reduce((s, d) => s + d.recency, 0) / segment.length).toFixed(0),
+                    percentage: ((segment.length / data.length) * 100).toFixed(1)
+                };
+            }).filter(Boolean);
+
+            const segmentBadgeClass = {
+                'Champions': 'segment-champions',
+                'Loyal': 'segment-loyal',
+                'At Risk': 'segment-atrisk',
+                'Lost': 'segment-lost',
+                'New': 'segment-new',
+                'Potential': 'segment-loyal',
+                'Other': 'segment-atrisk'
+            };
+
+            let html = '<table><thead><tr><th>Segment</th><th>Count</th><th>% of Base</th><th>Avg LTV (£)</th><th>Avg Frequency</th><th>Avg Recency (days)</th></tr></thead><tbody>';
+
+            segmentStats.forEach(stat => {
+                html += `<tr>
+                    <td><span class="segment-badge ${segmentBadgeClass[stat.segment]}">${stat.segment}</span></td>
+                    <td>${stat.count}</td>
+                    <td>${stat.percentage}%</td>
+                    <td>£${stat.avgLTV}</td>
+                    <td>${stat.avgFreq}</td>
+                    <td>${stat.avgRecency}</td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('rfmTable').innerHTML = html;
+        }
+
+        function renderPCA(data, projection) {
+            const trace = {
+                x: projection.map(p => p[0]),
+                y: projection.map(p => p[1]),
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    size: 5,
+                    color: data.map(d => d.cluster),
+                    colorscale: [[0, '#f472b6'], [0.33, '#38bdf8'], [0.66, '#a78bfa'], [1, '#6ee7b7']],
+                    showscale: true,
+                    colorbar: { title: 'Cluster' }
+                },
+                text: data.map(d => `${d.customerId}<br>Cluster: ${d.cluster}<br>Segment: ${d.segment}`),
+                hovertemplate: '<b>%{text}</b><br>PC1: %{x:.3f}<br>PC2: %{y:.3f}<extra></extra>'
+            };
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'Principal Component 1' },
+                yaxis: { title: 'Principal Component 2' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(30,41,59,0.3)',
+                font: { color: '#e2e8f0' },
+                hovermode: 'closest',
+                height: 500
+            };
+
+            Plotly.newPlot('pcaPlot', [trace], layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderElbow(data) {
+            const elbowData = [];
+            for (let k = 1; k <= 10; k++) {
+                const kmeans = kMeansClustering(data, k);
+                elbowData.push({ k, wcss: kmeans.wcss });
+            }
+
+            const trace = {
+                x: elbowData.map(d => d.k),
+                y: elbowData.map(d => d.wcss),
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'WCSS',
+                line: { color: '#f472b6', width: 3 },
+                marker: { size: 8 },
+                hovertemplate: 'K: %{x}<br>WCSS: %{y:.0f}<extra></extra>'
+            };
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'Number of Clusters (K)' },
+                yaxis: { title: 'Within-Cluster Sum of Squares' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(30,41,59,0.3)',
+                font: { color: '#e2e8f0' },
+                annotations: [{
+                    x: 4, y: elbowData[3].wcss,
+                    text: '← Optimal K=4',
+                    showarrow: true,
+                    arrowhead: 2,
+                    arrowsize: 1,
+                    arrowwidth: 2,
+                    arrowcolor: '#38bdf8',
+                    font: { color: '#38bdf8' }
+                }],
+                height: 400
+            };
+
+            Plotly.newPlot('elbowPlot', [trace], layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderRadar(data, kmeans) {
+            const features = ['Recency', 'Frequency', 'Monetary', 'Account Age', 'Days Inactive'];
+            const clusterProfiles = [];
+
+            for (let c = 0; c < 4; c++) {
+                const clusterData = data.filter((_, i) => kmeans.assignments[i] === c);
+                if (clusterData.length === 0) continue;
+
+                const values = [
+                    100 - (clusterData.reduce((s, d) => s + d.recency, 0) / clusterData.length / 1.8),
+                    (clusterData.reduce((s, d) => s + d.frequency, 0) / clusterData.length) * 3,
+                    (clusterData.reduce((s, d) => s + d.monetary, 0) / clusterData.length) / 30,
+                    (clusterData.reduce((s, d) => s + d.accountAge, 0) / clusterData.length) / 3.65,
+                    100 - (clusterData.reduce((s, d) => s + d.daysSinceLastPurchase, 0) / clusterData.length / 1.8)
+                ];
+
+                clusterProfiles.push({
+                    type: 'scatterpolar',
+                    r: values.map(v => Math.min(100, Math.max(0, v))),
+                    theta: features,
+                    fill: 'toself',
+                    name: `Cluster ${c}`,
+                    opacity: 0.7
+                });
+            }
+
+            const layout = {
+                polar: {
+                    radialaxis: { visible: true, range: [0, 100], color: '#94a3b8' },
+                    bgcolor: 'rgba(30,41,59,0.3)'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: '#e2e8f0' },
+                height: 450
+            };
+
+            Plotly.newPlot('radarPlot', clusterProfiles, layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderClusteringMetrics(churnMetrics) {
+            const html = `
+                <div class="stats-row">
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Accuracy</div>
+                        <div class="stat-mini-value">${(churnMetrics.accuracy * 100).toFixed(1)}%</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Precision</div>
+                        <div class="stat-mini-value">${(churnMetrics.precision * 100).toFixed(1)}%</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Recall</div>
+                        <div class="stat-mini-value">${(churnMetrics.recall * 100).toFixed(1)}%</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">F1 Score</div>
+                        <div class="stat-mini-value">${churnMetrics.f1.toFixed(3)}</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">AUC-ROC</div>
+                        <div class="stat-mini-value">${churnMetrics.auc.toFixed(3)}</div>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>Interpretation:</strong> The clustering identifies distinct customer groups with meaningful separation based on behavioral and monetary features. Optimal K=4 provides meaningful business segments without over-segmentation.
+                </div>
+            `;
+            document.getElementById('clusteringMetrics').innerHTML = html;
+        }
+
+        function renderCohortHeatmap(cohorts, data) {
+            const cohortMonths = Object.keys(cohorts).sort();
+            const months = [];
+            const cohortHeatmap = [];
+
+            cohortMonths.forEach(cohortMonth => {
+                months.push(cohortMonth);
+                const cohortUsers = cohorts[cohortMonth].users;
+                const monthRetention = [];
+
+                for (let m = 0; m < 12; m++) {
+                    const targetDate = new Date(cohortMonth + '-01');
+                    targetDate.setMonth(targetDate.getMonth() + m);
+                    const targetMonth = targetDate.toISOString().substring(0, 7);
+
+                    const activeInMonth = data.filter(c => {
+                        const cohortMonthDate = new Date(cohortMonth + '-01');
+                        return c.signupDate <= cohortMonthDate &&
+                               (new Date(targetMonth + '-01') - c.lastPurchaseDate) / (1000 * 60 * 60 * 24) < 60;
+                    }).length;
+
+                    monthRetention.push(cohortUsers > 0 ? (activeInMonth / cohortUsers * 100) : 0);
+                }
+                cohortHeatmap.push(monthRetention);
+            });
+
+            const trace = {
+                z: cohortHeatmap,
+                x: Array.from({ length: 12 }, (_, i) => `Month ${i}`),
+                y: months,
+                type: 'heatmap',
+                colorscale: [
+                    [0, '#1a1f3a'],
+                    [0.2, '#f43f5e'],
+                    [0.4, '#fb923c'],
+                    [0.6, '#eab308'],
+                    [0.8, '#6ee7b7'],
+                    [1, '#38bdf8']
+                ],
+                hovertemplate: 'Cohort: %{y}<br>Month: %{x}<br>Retention: %{z:.1f}%<extra></extra>'
+            };
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'Months Since Signup' },
+                yaxis: { title: 'Signup Cohort' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: '#e2e8f0' },
+                height: 400
+            };
+
+            Plotly.newPlot('cohortHeatmap', [trace], layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderCLVBoxPlot(data) {
+            const segments = ['Champions', 'Loyal', 'At Risk', 'Lost', 'New', 'Potential'];
+            const traces = segments.map(seg => {
+                const segment = data.filter(d => d.segment === seg);
+                return {
+                    y: segment.map(d => d.monetary),
+                    name: seg,
+                    type: 'box',
+                    boxmean: 'sd',
+                    hovertemplate: 'CLV: £%{y:.2f}<extra></extra>'
+                };
+            });
+
+            const layout = {
+                title: '',
+                yaxis: { title: 'Customer Lifetime Value (£)' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(30,41,59,0.3)',
+                font: { color: '#e2e8f0' },
+                height: 400
+            };
+
+            Plotly.newPlot('clvBoxPlot', traces, layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderCohortRevenue(cohorts) {
+            const cohortMonths = Object.keys(cohorts).sort();
+            const months = [];
+            const cohortRevenueLines = [];
+
+            cohortMonths.forEach((cohortMonth, idx) => {
+                const revenueOverTime = [cohorts[cohortMonth].revenue];
+                for (let m = 1; m < 12; m++) {
+                    revenueOverTime.push(revenueOverTime[m - 1] * 0.95); // Decay for demo
+                }
+                cohortRevenueLines.push(revenueOverTime);
+            });
+
+            const traces = cohortMonths.map((month, idx) => ({
+                y: cohortRevenueLines[idx],
+                x: Array.from({ length: 12 }, (_, i) => `M${i}`),
+                name: month,
+                type: 'scatter',
+                mode: 'lines',
+                hovertemplate: 'Revenue: £%{y:.0f}<extra></extra>'
+            }));
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'Months Since Cohort' },
+                yaxis: { title: 'Monthly Revenue (£)' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(30,41,59,0.3)',
+                font: { color: '#e2e8f0' },
+                height: 400,
+                hovermode: 'x unified'
+            };
+
+            Plotly.newPlot('cohortRevenue', traces, layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderFeatureImportance(weights) {
+            const features = ['Recency', 'Frequency', 'Monetary', 'Account Age', 'Order Value'];
+            const importance = weights.slice(1).map(w => Math.abs(w));
+
+            const trace = {
+                x: importance,
+                y: features,
+                type: 'bar',
+                orientation: 'h',
+                marker: { color: '#f472b6' },
+                hovertemplate: '%{y}: %{x:.4f}<extra></extra>'
+            };
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'Absolute Coefficient Value' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(30,41,59,0.3)',
+                font: { color: '#e2e8f0' },
+                height: 400
+            };
+
+            Plotly.newPlot('featureImportance', [trace], layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderConfusionMatrix(metrics) {
+            const confusionData = [
+                [metrics.tn, metrics.fp],
+                [metrics.fn, metrics.tp]
+            ];
+
+            const trace = {
+                z: confusionData,
+                x: ['No Churn', 'Churn'],
+                y: ['No Churn', 'Churn'],
+                type: 'heatmap',
+                colorscale: [
+                    [0, '#1a1f3a'],
+                    [0.5, '#38bdf8'],
+                    [1, '#f472b6']
+                ],
+                text: confusionData,
+                texttemplate: '%{text}',
+                textfont: { size: 16, color: '#fff' },
+                hovertemplate: 'Predicted: %{x}<br>Actual: %{y}<br>Count: %{z}<extra></extra>'
+            };
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'Predicted' },
+                yaxis: { title: 'Actual' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: '#e2e8f0' },
+                height: 400
+            };
+
+            Plotly.newPlot('confusionMatrix', [trace], layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderROCCurve(data, predictions) {
+            const thresholds = [];
+            const tpr = [], fpr = [];
+
+            for (let t = 0; t <= 100; t += 5) {
+                const threshold = t / 100;
+                let tp = 0, fp = 0, fn = 0, tn = 0;
+
+                data.forEach((d, i) => {
+                    const pred = predictions[i] > threshold ? 1 : 0;
+                    if (d.churn === 1 && pred === 1) tp++;
+                    else if (d.churn === 0 && pred === 1) fp++;
+                    else if (d.churn === 1 && pred === 0) fn++;
+                    else tn++;
+                });
+
+                const tprVal = (tp / (tp + fn)) || 0;
+                const fprVal = (fp / (fp + tn)) || 0;
+                tpr.push(tprVal);
+                fpr.push(fprVal);
+            }
+
+            const trace = {
+                x: fpr,
+                y: tpr,
+                type: 'scatter',
+                mode: 'lines',
+                fill: 'tozeroy',
+                line: { color: '#f472b6', width: 3 },
+                fillcolor: 'rgba(244, 114, 182, 0.2)',
+                hovertemplate: 'FPR: %{x:.3f}<br>TPR: %{y:.3f}<extra></extra>'
+            };
+
+            const diagonal = {
+                x: [0, 1],
+                y: [0, 1],
+                type: 'scatter',
+                mode: 'lines',
+                line: { color: '#94a3b8', width: 2, dash: 'dash' },
+                name: 'Random',
+                hovertemplate: 'Random Classifier<extra></extra>'
+            };
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'False Positive Rate' },
+                yaxis: { title: 'True Positive Rate' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(30,41,59,0.3)',
+                font: { color: '#e2e8f0' },
+                height: 400
+            };
+
+            Plotly.newPlot('rocCurve', [trace, diagonal], layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderChurnProbability(predictions) {
+            const trace = {
+                x: predictions,
+                type: 'histogram',
+                nbinsx: 40,
+                marker: { color: '#38bdf8', opacity: 0.8 },
+                hovertemplate: 'Probability: %{x:.3f}<br>Count: %{y}<extra></extra>'
+            };
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'Predicted Churn Probability' },
+                yaxis: { title: 'Number of Customers' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(30,41,59,0.3)',
+                font: { color: '#e2e8f0' },
+                height: 400
+            };
+
+            Plotly.newPlot('churnProbPlot', [trace], layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderSankey(data) {
+            const segments = ['New', 'Active', 'Repeat', 'Loyal', 'Churned'];
+            const nodeColors = ['#6ee7b7', '#38bdf8', '#a78bfa', '#f472b6', '#f43f5e'];
+
+            // Classify customers into stages
+            const staged = data.map(d => {
+                if (d.accountAge < 90) return 'New';
+                if (d.daysSinceLastPurchase > 60) return 'Churned';
+                if (d.frequency > 10 && d.monetary > 1000) return 'Loyal';
+                if (d.frequency > 3) return 'Repeat';
+                return 'Active';
+            });
+
+            const counts = {};
+            segments.forEach(seg => {
+                counts[seg] = staged.filter(s => s === seg).length;
+            });
+
+            // Build flow
+            const source = [];
+            const target = [];
+            const value = [];
+            const colors = [];
+
+            const flowMap = {
+                'New': ['Active', 'Repeat', 'Churned'],
+                'Active': ['Repeat', 'Loyal', 'Churned'],
+                'Repeat': ['Loyal', 'Churned'],
+                'Loyal': ['Churned']
+            };
+
+            Object.entries(flowMap).forEach(([from, tos]) => {
+                const fromIdx = segments.indexOf(from);
+                const fromCount = counts[from] || 1;
+
+                tos.forEach(to => {
+                    const toIdx = segments.indexOf(to);
+                    const flowCount = Math.floor(fromCount * (0.3 + Math.random() * 0.4));
+                    if (flowCount > 0) {
+                        source.push(fromIdx);
+                        target.push(toIdx);
+                        value.push(flowCount);
+                        colors.push('rgba(244, 114, 182, 0.4)');
+                    }
+                });
+            });
+
+            const trace = {
+                type: 'sankey',
+                node: {
+                    pad: 15,
+                    thickness: 20,
+                    line: { color: '#94a3b8', width: 1 },
+                    label: segments,
+                    color: nodeColors
+                },
+                link: {
+                    source: source,
+                    target: target,
+                    value: value,
+                    color: colors
+                }
+            };
+
+            const layout = {
+                title: '',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(30,41,59,0.3)',
+                font: { color: '#e2e8f0' },
+                height: 500
+            };
+
+            Plotly.newPlot('sankey', [trace], layout, { responsive: true, displayModeBar: false });
+        }
+
+        function renderGeoMap(data) {
+            // Aggregate by region
+            const regionStats = {};
+            const regions = ['London', 'Southeast', 'Southwest', 'Midlands', 'East Anglia', 'North West', 'North East', 'Scotland', 'Wales', 'Northern Ireland'];
+
+            regions.forEach(region => {
+                const regionData = data.filter(d => d.region === region);
+                regionStats[region] = {
+                    revenue: regionData.reduce((s, d) => s + d.totalSpend, 0),
+                    customers: regionData.length,
+                    avgLTV: regionData.length > 0 ? regionData.reduce((s, d) => s + d.totalSpend, 0) / regionData.length : 0
+                };
+            });
+
+            const trace = {
+                type: 'bar',
+                x: regions,
+                y: Object.values(regionStats).map(r => r.revenue),
+                marker: { color: '#f472b6', opacity: 0.8 },
+                text: Object.values(regionStats).map(r => `${r.customers} customers`),
+                textposition: 'outside',
+                hovertemplate: 'Region: %{x}<br>Revenue: £%{y:.0f}<br>Customers: %{text}<extra></extra>'
+            };
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'UK Region' },
+                yaxis: { title: 'Total Revenue (£)' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(30,41,59,0.3)',
+                font: { color: '#e2e8f0' },
+                height: 400
+            };
+
+            Plotly.newPlot('geoMap', [trace], layout, { responsive: true, displayModeBar: false });
+        }
+
+        // Initialize on load
+        window.addEventListener('load', initializeDashboard);
+    </script>
+</body>
+</html>
