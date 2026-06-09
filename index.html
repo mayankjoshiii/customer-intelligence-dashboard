@@ -619,11 +619,11 @@
             for (let i = 0; i < n; i++) {
                 const signupDate = new Date(baseDate.getTime() + rng.next() * (now.getTime() - baseDate.getTime()));
 
-                // Power law distribution for spend (realistic e-commerce pattern)
-                const totalSpend = Math.pow(rng.next(), -1.5) * 2000;
+                // Right-skewed spend distribution, bounded (realistic e-commerce: ~£50–£3,000)
+                const totalSpend = 50 + Math.pow(rng.next(), 2.5) * 2950;
 
-                // Exponential distribution for recency
-                const daysInactive = Math.floor(Math.pow(rng.next(), 0.7) * 180);
+                // Recency skewed toward recent activity (most customers active; ~25% inactive >60d)
+                const daysInactive = Math.floor(Math.pow(rng.next(), 3.5) * 180);
 
                 // Frequency related to spend
                 const totalOrders = Math.max(1, Math.floor(Math.pow(rng.next() + 0.3, 0.8) * 30));
@@ -1034,7 +1034,7 @@
                 <div class="card metric-card">
                     <span class="metric-label">Retention Rate</span>
                     <span class="metric-value metric-highlight">${metrics.retentionRate}%</span>
-                    <span class="metric-change positive">Good health</span>
+                    <span class="metric-change ${Number(metrics.retentionRate) >= 70 ? 'positive' : 'negative'}">${Number(metrics.retentionRate) >= 70 ? 'Good health' : 'Needs attention'}</span>
                 </div>
                 <div class="card metric-card">
                     <span class="metric-label">Top 20% Revenue Share</span>
