@@ -1,6 +1,8 @@
 # Customer Intelligence & ML Segmentation Dashboard
 
-A production-quality, single-file HTML application demonstrating applied machine learning for business analytics. This portfolio project showcases the intersection of ML engineering and business intelligence through interactive visualizations and real implementations of clustering, regression, and segmentation algorithms.
+> **Demo on simulated data.** Every number on this dashboard is generated in the browser by a random number generator, so the figures are illustrative. They are not results from real company data or a trained production model. The project shows how the analysis and the interactive visuals work, built as a single HTML file with Plotly.js.
+
+A single-file HTML application demonstrating applied machine learning for business analytics. This portfolio project showcases the intersection of ML engineering and business intelligence through interactive visualizations and real implementations of clustering, regression, and segmentation algorithms.
 
 **Live Demo & Portfolio:** Deployed as part of professional portfolio for data science/analytics roles.
 
@@ -475,8 +477,8 @@ A: Demonstrates deep understanding of the mathematics. Libraries abstract comple
 **Q: How do I use my own data?**
 A: Replace `generateCustomerData()` with your own data fetching logic. The algorithm functions accept any data array with the required fields.
 
-**Q: Is this production-ready?**
-A: For demo/portfolio purposes, yes. For production:
+**Q: Could this run in production?**
+A: Not as it stands. It is a portfolio demo on simulated data. To make it production-grade you would:
 - Add data persistence (database)
 - Implement authentication
 - Add API rate limiting
@@ -492,4 +494,4 @@ A: On synthetic data, AUC-ROC ~0.72-0.78 (realistic). On real data, would depend
 
 **Last Updated**: March 2026
 **Version**: 1.0.0
-**Status**: Production-Ready Portfolio Project
+**Status**: Portfolio Project
